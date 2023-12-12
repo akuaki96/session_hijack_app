@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next"; //Next.jsのAPIルートで使用されるリクエストとレスポンスの型
 import { withIronSession, Session } from "next-iron-session";
+import { randomBytes } from "crypto"; // Node.jsのcryptoモジュールからrandomBytesをインポート
 
 //NextApiRequest型にsessionプロパティが存在しないためNextApiRequestを拡張
 interface CustomNextApiRequest extends NextApiRequest {
@@ -29,8 +30,9 @@ const handler = async (req: CustomNextApiRequest, res: NextApiResponse) => {
   return res.status(401).json({ message: "Invalid credentials" });
 };
 
+const randomPassword = randomBytes(32).toString("hex"); // ランダムな32文字のパスワードを生成
 export default withIronSession(handler, {
-  password: "random-password-for-encryption", // セッションを暗号化するためのパスワード
+  password: randomPassword, // セッションを暗号化するためのパスワード
   cookieName: "my-session-cookie", // クライアントに送信されるクッキーの名前
   cookieOptions: {
     secure: process.env.NODE_ENV === "production", // HTTPSでのみクッキーを送信する
